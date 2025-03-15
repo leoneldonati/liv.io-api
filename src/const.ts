@@ -17,3 +17,14 @@ export const CLOUDINARY_CREDENTIALS = {
   CLD_SECRET: process.env.CLD_SECRET,
   CLD_KEY: process.env.CLD_KEY,
 };
+
+// COOKIES
+export const COOKIE_NAME = "cookie-token";
+
+// NODE JS
+export const IS_PROD = process.env.NODE_ENV === "production";
+
+// OTHERS
+export const ONE_HOUR_IN_MS = new Date(
+  new Date().getTime() + 60 * 60 * 1000
+).getMilliseconds();

@@ -1,4 +1,4 @@
-import { JWT_SECRET } from "@const";
+import { JWT_SECRET, ONE_HOUR_IN_MS } from "@const";
 import jwt from "jsonwebtoken";
 
 export const validateToken = (token: string) => {
@@ -6,8 +6,5 @@ export const validateToken = (token: string) => {
 };
 
 export const signToken = (payload: string) => {
-  const ONE_HOUR = new Date(
-    new Date().getTime() + 60 * 60 * 1000
-  ).getMilliseconds();
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: ONE_HOUR });
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: ONE_HOUR_IN_MS });
 };

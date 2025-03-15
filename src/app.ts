@@ -2,6 +2,7 @@ import express from "express";
 import morgan from "morgan";
 import fileUpload from "express-fileupload";
 import { authRouter } from "@routes/auth";
+import { userRouter } from "@routes/user";
 
 export const app = express();
 
@@ -21,3 +22,6 @@ app.use(fileUpload());
 
 //autenticacion
 app.use(authRouter);
+
+//usuarios
+app.use(userRouter);
