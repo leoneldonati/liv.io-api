@@ -11,7 +11,7 @@ type Asset = {
   width: number;
   height: number;
   size: number;
-  lastModified: Date;
+  lastModified: string;
 };
 type Settings = {
   theme: string;
@@ -37,6 +37,8 @@ interface User {
   followers: Follower[];
   following: Follower[];
   settings: Settings;
+  joinedAt: Date;
+  updatedAt: Date;
 }
 
 type UserWithoutId = Omit<User, "_id">;

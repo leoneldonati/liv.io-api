@@ -16,19 +16,17 @@ export async function uploadFile(buffer: ArrayBuffer, fileType: string) {
       folder: "livio-files",
     });
     return {
-      ok: true,
       uploadedAsset: {
         secureUrl: result.secure_url,
         publicId: result.public_id,
         width: result.width,
         height: result.height,
         size: result.bytes,
-        lastUpdate: result.created_at,
+        lastModified: result.created_at,
       },
     };
   } catch (e) {
     return {
-      ok: false,
       uploadedAsset: null,
     };
   }
