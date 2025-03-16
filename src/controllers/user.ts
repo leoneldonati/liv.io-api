@@ -1,13 +1,16 @@
 import { userModel } from "@db";
 import { parse } from "@utils/zod";
+import { convertFile } from "@libs/sharp";
+import { deleteFile, uploadFile } from "@libs/cld";
+import { getLocationByIp } from "@utils/ip";
+import { hash } from "@libs/bcrypt";
 import { z } from "zod";
-import type { Asset, UserWithoutId } from "definitions";
+import { ObjectId } from "mongodb";
+import type { Asset, User, UserWithoutId } from "definitions";
 import type { Request, Response } from "express";
 import type { UploadedFile } from "express-fileupload";
-import { convertFile } from "@libs/sharp";
-import { uploadFile } from "@libs/cld";
-import { getLocationByIp } from "@utils/ip";
 
+// CREAR USUARIO
 const userPayloadModel = z.object({
   name: z
     .string()
@@ -42,11 +45,20 @@ export const createUserController = async (req: Request, res: Response) => {
     const findedUserByUsername = await userModel.findOne({
       username: userPayload.username,
     });
-
     if (findedUserByUsername) {
       res.status(400).json({ message: "This username has been registered." });
       return;
     }
+
+    // VERIFICAR SI EL EMAIL SE ENCUENTRA REGISTRADO
+    const findedUserByEmail = await userModel.findOne({
+      email: userPayload.email,
+    });
+    if (findedUserByEmail) {
+      res.status(400).json({ message: "This email has been registered." });
+      return;
+    }
+
     // VERIFICAR SI HAY ARCHIVOS PARA SUBIR
     let uploadedResult: Array<{ name: string; uploadedAsset: Asset }> = [];
     if (files) {
@@ -71,9 +83,91 @@ export const createUserController = async (req: Request, res: Response) => {
       }
     }
 
+    // ESTADOS BOOLEANOS PARA COMPROBAR SUBIDAS DE ARCHIVOS
+    const hasNotUploaded = uploadedResult.length === 0;
+    const hasUploadedAvatar =
+      !hasNotUploaded && uploadedResult.some((res) => res.name === "avatar");
+    const hasUploadedHeader =
+      !hasNotUploaded && uploadedResult.some((res) => res.name === "header");
+
+    // ENCRIPTAR LA CONTRASEÑA
+    const hashedPassword = await hash(userPayload.password);
+
+    // OBTENER LOCALIZACION DEL USUARIO A REGISTRAR
     const location = await getLocationByIp(req.ip);
 
-    res.json({ userPayload, uploadedResult });
+    // CONSTRUIR MODELO DE USUARIO A GUARDAR
+    const newUser: UserWithoutId = {
+      name: userPayload.name,
+      username: userPayload.username,
+      password: hashedPassword,
+      bio: userPayload.bio,
+      email: userPayload.email,
+      date: new Date(userPayload.date),
+      location,
+      hasPremium: false,
+      followers: [],
+      following: [],
+      joinedAt: new Date(),
+      updatedAt: new Date(),
+      settings: {
+        accentColor: "",
+        enableNotifications: true,
+        theme: "",
+      },
+      avatar: !hasUploadedAvatar
+        ? null
+        : uploadedResult.find((res) => res.name === "avatar")?.uploadedAsset,
+      header: !hasUploadedHeader
+        ? null
+        : uploadedResult.find((res) => res.name === "header")?.uploadedAsset,
+    };
+
+    // GUARDAR NUEVO USUARIO
+    const insertedDocument = await userModel.insertOne(newUser);
+    res.json(insertedDocument);
+  } catch (e) {
+    res.status(500).json({ message: "Error on server." });
+  }
+};
+
+// BORRAR USUARIO
+export const deleteUserController = async (req: Request, res: Response) => {
+  const params = req.params;
+  if (!params?._id) {
+    res.status(400).json({ message: "You must include id param" });
+    return;
+  }
+
+  try {
+    // BUSCAR USUARIO A ELIMINAR PARA ELIMINAR LAS FOTOS ANTES
+    const userToDelete = (await userModel.findOne({
+      _id: new ObjectId(params._id),
+    })) as User | null;
+
+    if (!userToDelete) {
+      res.status(404).json({ message: "This user is not registered." });
+      return;
+    }
+    // EXTRAER AVATAR Y PORTADA
+    const avatarPublicId = userToDelete.avatar?.publicId;
+    const headerPublicId = userToDelete.header?.publicId;
+
+    //JUNTAR EN UN ARRAY
+    const arrayFromIds = [avatarPublicId, headerPublicId];
+
+    arrayFromIds.forEach(async (id) => {
+      if (id) {
+        await deleteFile(id);
+      }
+    });
+
+    // FINALMENTE, ELIMINAR EL USUARIO DE LA BDD
+    const deletedResult = await userModel.findOneAndDelete({
+      _id: new ObjectId(params._id),
+    });
+
+    res.json({ deletedResult });
   } catch (e) {
     res.status(500).json({ message: "Error on server." });
   }
