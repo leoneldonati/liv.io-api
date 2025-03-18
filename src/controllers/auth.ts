@@ -3,8 +3,9 @@ import { userModel } from "@db";
 import { isMatch } from "@libs/bcrypt";
 import { signToken } from "@libs/jsonwebtoken";
 import { parse } from "@utils/zod";
-import type { Request, Response } from "express";
 import { z } from "zod";
+import type { User } from "definitions";
+import type { Request, Response } from "express";
 
 const loginModel = z.object({
   email: z.string().email({ message: "Invalid email format." }),
@@ -45,7 +46,7 @@ export const loginController = async (req: Request, res: Response) => {
       return;
     }
 
-    const signedToken = await signToken(JSON.stringify(user));
+    const signedToken = await signToken(user as User);
 
     const ONE_HOUR = 60 * 60 * 1000;
     res
@@ -54,8 +55,9 @@ export const loginController = async (req: Request, res: Response) => {
         secure: IS_PROD,
         maxAge: ONE_HOUR,
       })
-      .json({ message: "Logged succefully!" });
+      .json({ message: `Logged succefully! Welcome back ${user.name}!` });
   } catch (e) {
+    console.log(e);
     res.status(500).json({ message: "Error on server" });
   }
 };

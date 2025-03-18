@@ -125,7 +125,10 @@ export const createUserController = async (req: Request, res: Response) => {
 
     // GUARDAR NUEVO USUARIO
     const insertedDocument = await userModel.insertOne(newUser);
-    res.json(insertedDocument);
+    res.json({
+      message: "User created succefully!",
+      insertedId: insertedDocument.insertedId,
+    });
   } catch (e) {
     res.status(500).json({ message: "Error on server." });
   }
@@ -163,11 +166,11 @@ export const deleteUserController = async (req: Request, res: Response) => {
     });
 
     // FINALMENTE, ELIMINAR EL USUARIO DE LA BDD
-    const deletedResult = await userModel.findOneAndDelete({
+    await userModel.findOneAndDelete({
       _id: new ObjectId(params._id),
     });
 
-    res.json({ deletedResult });
+    res.json({ message: "User deleted succefully!" });
   } catch (e) {
     res.status(500).json({ message: "Error on server." });
   }

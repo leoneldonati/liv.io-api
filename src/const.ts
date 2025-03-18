@@ -18,6 +18,9 @@ export const CLOUDINARY_CREDENTIALS = {
   CLD_KEY: process.env.CLD_KEY,
 };
 
+// CLIENT ORIGIN
+export const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN;
+
 // COOKIES
 export const COOKIE_NAME = "cookie-token";
 
