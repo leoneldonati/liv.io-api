@@ -1,3 +1,4 @@
+import type { Request } from "express";
 import type { ObjectId } from "mongodb";
 
 interface UserLocation {
@@ -43,13 +44,27 @@ interface User {
 
 type UserWithoutId = Omit<User, "_id">;
 
+interface PostOwner {
+  _id: ObjectId;
+  name: string;
+  username: string;
+  avatar: Asset | null;
+  joinedAt: Date;
+}
+
 interface Post {
   _id: ObjectId;
   content: string;
   createdAt: Date;
   updatedAt: Date;
   hashtags: string[];
-  files: Asset[];
+  files: Asset[] | null;
   likes: string[];
   responses: Omit<Post, "responses">[];
+  owner: PostOwner;
+}
+
+type PostWithoutId = Omit<Post, "_id">;
+interface RequestWithUser extends Request {
+  userLogged: User;
 }

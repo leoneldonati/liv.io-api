@@ -3,6 +3,6 @@ import { Router } from "express";
 
 export const userRouter = Router();
 
-userRouter.post("/user", createUserController);
+userRouter.post("/user/create", createUserController);
 
-userRouter.delete("/user/:_id", deleteUserController);
+userRouter.delete("/user/delete/:_id", deleteUserController);

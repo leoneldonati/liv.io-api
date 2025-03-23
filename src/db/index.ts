@@ -15,3 +15,11 @@ export const connectToDb = async () => {
 export const userModel = client
   .db(MONGO_CREDENTIALS.DB_NAME)
   .collection("users");
+
+export const postModel = client
+  .db(MONGO_CREDENTIALS.DB_NAME)
+  .collection("posts");
+
+export const historiesModel = client
+  .db(MONGO_CREDENTIALS.DB_NAME)
+  .collection("histories");

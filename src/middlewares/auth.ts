@@ -1,15 +1,17 @@
 import { COOKIE_CONFIG, COOKIE_NAME } from "@const";
 import { validateToken } from "@libs/jsonwebtoken";
-import type { CookieOptions, NextFunction, Request, Response } from "express";
+import type { RequestWithUser, User } from "definitions";
+import type { CookieOptions, NextFunction, Response } from "express";
 
+const UNPROTECTED_ROUTES = ["/login", "/user/create"];
 export const authMiddleware = (
-  req: Request,
+  req: RequestWithUser,
   res: Response,
   next: NextFunction
 ) => {
   const url = req.url;
 
-  if (url === "/login") {
+  if (UNPROTECTED_ROUTES.includes(url)) {
     next();
     return;
   }
@@ -36,5 +38,7 @@ export const authMiddleware = (
       });
     return;
   }
+
+  req.userLogged = decoded as User;
   next();
 };

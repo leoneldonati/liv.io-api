@@ -59,8 +59,10 @@ export const loginController = async (req: Request, res: Response) => {
 };
 
 export const logoutController = async (_, res: Response) => {
-  res.cookie(COOKIE_NAME, "", {
-    ...(COOKIE_CONFIG as CookieOptions),
-    maxAge: 0,
-  });
+  res
+    .cookie(COOKIE_NAME, "", {
+      ...(COOKIE_CONFIG as CookieOptions),
+      maxAge: 0,
+    })
+    .json({ message: "Logged out!" });
 };
