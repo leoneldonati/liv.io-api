@@ -21,9 +21,6 @@ export const CLOUDINARY_CREDENTIALS = {
 // CLIENT ORIGIN
 export const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN;
 
-// COOKIES
-export const COOKIE_NAME = "cookie-token";
-
 // NODE JS
 export const IS_PROD = process.env.NODE_ENV === "production";
 
@@ -31,3 +28,14 @@ export const IS_PROD = process.env.NODE_ENV === "production";
 export const ONE_HOUR_IN_MS = new Date(
   new Date().getTime() + 60 * 60 * 1000
 ).getMilliseconds();
+const ONE_HOUR = 60 * 60 * 1000;
+
+// COOKIES
+
+export const COOKIE_NAME = "cookie-token";
+export const COOKIE_CONFIG = {
+  httpOnly: true,
+  secure: IS_PROD,
+  maxAge: ONE_HOUR,
+  sameSite: "lax",
+};

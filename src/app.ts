@@ -2,11 +2,12 @@ import express from "express";
 import morgan from "morgan";
 import fileUpload from "express-fileupload";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import { authRouter } from "@routes/auth";
 import { userRouter } from "@routes/user";
 import { postRouter } from "@routes/post";
 import { CLIENT_ORIGIN } from "@const";
-
+import { authMiddleware } from "@middlewares/auth";
 export const app = express();
 
 // LOGS DE PRODUCCION
@@ -19,6 +20,7 @@ app.disable("x-powered-by");
 app.use(
   cors({
     origin: CLIENT_ORIGIN,
+    credentials: true,
   })
 );
 // parsear json requests
@@ -27,8 +29,12 @@ app.use(express.json());
 
 // recibir archivos
 app.use(fileUpload());
-// RUTAS
 
+app.use(cookieParser());
+// middlewares
+app.use(authMiddleware);
+
+// RUTAS
 //autenticacion
 app.use(authRouter);
 

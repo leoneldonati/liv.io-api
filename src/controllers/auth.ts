@@ -1,11 +1,11 @@
-import { COOKIE_NAME, IS_PROD } from "@const";
+import { COOKIE_CONFIG, COOKIE_NAME } from "@const";
 import { userModel } from "@db";
 import { isMatch } from "@libs/bcrypt";
 import { signToken } from "@libs/jsonwebtoken";
 import { parse } from "@utils/zod";
 import { z } from "zod";
 import type { User } from "definitions";
-import type { Request, Response } from "express";
+import type { CookieOptions, Request, Response } from "express";
 
 const loginModel = z.object({
   email: z.string().email({ message: "Invalid email format." }),
@@ -48,16 +48,19 @@ export const loginController = async (req: Request, res: Response) => {
 
     const signedToken = await signToken(user as User);
 
-    const ONE_HOUR = 60 * 60 * 1000;
-    res
-      .cookie(COOKIE_NAME, signedToken, {
-        httpOnly: true,
-        secure: IS_PROD,
-        maxAge: ONE_HOUR,
-      })
-      .json({ message: `Logged succefully! Welcome back ${user.name}!` });
+    res.cookie(COOKIE_NAME, signedToken, COOKIE_CONFIG as CookieOptions).json({
+      message: `Logged succefully! Welcome back ${user.name}!`,
+      userAuthenticated: user,
+    });
   } catch (e) {
     console.log(e);
     res.status(500).json({ message: "Error on server" });
   }
+};
+
+export const logoutController = async (_, res: Response) => {
+  res.cookie(COOKIE_NAME, "", {
+    ...(COOKIE_CONFIG as CookieOptions),
+    maxAge: 0,
+  });
 };
