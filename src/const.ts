@@ -2,6 +2,9 @@ import { config } from "dotenv";
 // LEER VARIABLES .env
 config();
 
+// PUERTO
+export const PORT = process.env.PORT ?? 3000;
+
 // JSONWEBTOKEN SECRET
 export const JWT_SECRET = process.env.SECRET_JWT_KEY;
 

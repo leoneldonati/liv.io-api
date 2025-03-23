@@ -1,7 +1,8 @@
 import { app } from "@app";
+import { PORT } from "@const";
 import { connectToDb } from "@db";
 
-app.listen(3000, async () => {
+app.listen(PORT, async () => {
   await connectToDb();
-  console.log(`Listen on: ${3000}`);
+  console.log(`Listen on: ${PORT}`);
 });
