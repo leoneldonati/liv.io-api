@@ -9,5 +9,8 @@
     "paths": {
       "@*": ["./src/*"]
     }
-  }
+  },
+
+  "include": ["src/**/*"], // Ensure only src/ files are compiled
+  "exclude": ["node_modules", "dist"]
 }
