@@ -23,3 +23,7 @@ export const postModel = client
 export const historiesModel = client
   .db(MONGO_CREDENTIALS.DB_NAME)
   .collection("histories");
+
+export const communityModel = client
+  .db(MONGO_CREDENTIALS.DB_NAME)
+  .collection("communities");

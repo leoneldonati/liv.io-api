@@ -68,3 +68,5 @@ type PostWithoutId = Omit<Post, "_id">;
 interface RequestWithUser extends Request {
   userLogged: User;
 }
+
+interface Status {}

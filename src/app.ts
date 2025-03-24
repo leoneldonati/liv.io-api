@@ -9,6 +9,7 @@ import { postRouter } from "@routes/post";
 import { CLIENT_ORIGIN } from "@const";
 import { authMiddleware } from "@middlewares/auth";
 import { historiesRouter } from "@routes/histories";
+import { communitiesRouter } from "@routes/communities";
 export const app = express();
 
 // LOGS DE PRODUCCION
@@ -47,3 +48,6 @@ app.use(postRouter);
 
 // historias
 app.use(historiesRouter);
+
+// comunidades
+app.use(communitiesRouter);
