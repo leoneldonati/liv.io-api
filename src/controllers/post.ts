@@ -10,6 +10,7 @@ export const createPostController = async (
 ) => {
   try {
     const payload = req.body;
+    const files = req.files;
     const { _id, name, username, avatar, joinedAt } = req.userLogged;
 
     const newPost: PostWithoutId = {
@@ -30,7 +31,8 @@ export const createPostController = async (
     };
 
     const { insertedId } = await postModel.insertOne(newPost);
-    res.json({ _id: insertedId, ...newPost });
+    const newPostWithId = { _id: insertedId, ...newPost };
+    res.json(newPostWithId);
   } catch (e) {
     res.status(500).json({ message: "Error on server." });
   }
@@ -88,7 +90,7 @@ export const updatePostController = async (
       // emitir un evento para actualizar el status
       io.emit(`update-post-${to}`, {
         hasLiked: false,
-        msg: `Liked to ${to}`,
+        msg: `Liked to: ${to}`,
         updatedCounters: {
           likesCount: updatedDocument.likes.length,
           responsesCount: updatedDocument.responses.length,
